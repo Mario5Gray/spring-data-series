@@ -17,7 +17,7 @@ Simply drop in your schema setup with `resources/schema.sql`. Alternately or Add
 Standard Spring Data annotations occur here. Some things like specifying a column or table can be managed through these decorations.
 Because the use of `record` classes - which are immutable - we also perform stateless operations upon insertion. Seeing that we cannot just _change_ a value on the target entity, we will use something [BeforeConvertCallback]() that can give us a new object while ensuring before-write changes are made.
 
-### Not Data without an outlet
+### Data Outlet
 
 We need an outlet for the data, so choose Kafka and/or REST.
 Currently, this demo lands with a REST endpoint for exposing the data. The next 'topic' will have us sending our data directly to Kafka upon ingest - though we might be tempted to skip DBMS altogether given Kafka's persistence. However this example will use REST endpoints to _feed_ Kafka streams that expose another layer of context sensative information on our domain.
@@ -30,3 +30,15 @@ Such data can be published to Kafka streams, where a series of processes can tra
 
 You're already operating with a cloud provider, or have an installation - use the docker compose configuration to launch a cluster. 
 
+### The Producer
+
+Consume a REST endpoint and push data into a topic.
+
+### The Consumer
+
+Consume a topic and perform stream operations.
+
+
+## NOTES
+
+Complete the last 2 sections, make it reactive if possible.  
