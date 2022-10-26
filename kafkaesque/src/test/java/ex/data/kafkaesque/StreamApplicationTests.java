@@ -1,4 +1,4 @@
-package ex.data.stream;
+package ex.data.kafkaesque;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
