@@ -41,6 +41,8 @@ public class StreamApplication {
 //		));
 //	}
 
+	// TODO import USERS and merge with streams
+
     @Bean
     public Function<KStream<Long, Message>, KStream<Long, Long>> kstream(StreamsBuilder kstreamBuilder) {
         return kStream -> kStream
