@@ -11,13 +11,14 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
+import java.util.Random;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-// AIO funciton composition example
+// AIO function composition example
 @Slf4j
 @EnableScheduling
 @SpringBootApplication
@@ -43,7 +44,7 @@ public class ProducerApplication {
 
     @PollableBean
     public Supplier<TextMessage> sourceMessage() {
-        return () -> new TextMessage("Mario", "Binary", "101011111100");
+        return () -> new TextMessage("Mario", "Binary", Long.toBinaryString(new Random().nextInt(0xFFFFFF)));
     }
 
     @Bean
