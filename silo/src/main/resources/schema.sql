@@ -1,5 +1,4 @@
-CREATE
-SEQUENCE primary_key;
+CREATE SEQUENCE primary_key;
 DROP TABLE IF EXISTS users;
 DROP TABLE IF EXISTS messages;
 CREATE TABLE users
