@@ -29,8 +29,8 @@ class SiloDomainTests {
 				.isNotNull()
 				.hasNoNullFieldsOrProperties()
 				.hasFieldOrPropertyWithValue("id", 123L)
-				.hasFieldOrPropertyWithValue("from", 1)
-				.hasFieldOrPropertyWithValue("to", 2)
+				.hasFieldOrPropertyWithValue("from", 1L)
+				.hasFieldOrPropertyWithValue("to", 2L)
 				.hasFieldOrPropertyWithValue("text", "Test!");
 	}
 }

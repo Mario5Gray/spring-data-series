@@ -18,7 +18,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-// AIO function composition example
+// AIO function composition examples
 @Slf4j
 @EnableScheduling
 @SpringBootApplication
