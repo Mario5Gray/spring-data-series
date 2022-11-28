@@ -105,5 +105,18 @@ By viewing the dbserver1.inventory.customers topic, you can see how the MySQL co
 
 
 ```bash
-docker run -it --rm --network infra_default --name watcher --link zookeeper:zookeeper --link kafka:kafka quay.io/debezium/kafka:1.9 watch-topic -a -k dbserver1.inventory.customers
+docker-compose -f docker-compose.yml exec kafka /kafka/bin/kafka-console-consumer.sh \
+    --bootstrap-server kafka:9092 \
+    --from-beginning \
+    --property print.key=true \
+    --topic dbserver1.inventory.customers
 ```
+
+
+With that, we can then execute some mysql commands to watch the consumer logs increase:
+
+```bash
+docker-compose -f docker-compose.yml exec mysql bash -c 'mysql -u $MYSQL_USER -p$MYSQL_PASSWORD inventory'
+```
+
+You'll be given a mysql shell to operate with.
