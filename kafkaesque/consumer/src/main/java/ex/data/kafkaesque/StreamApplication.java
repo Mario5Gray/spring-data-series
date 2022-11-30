@@ -5,10 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.streams.KeyValue;
 import org.apache.kafka.streams.StreamsBuilder;
-import org.apache.kafka.streams.kstream.Grouped;
-import org.apache.kafka.streams.kstream.KStream;
-import org.apache.kafka.streams.kstream.KTable;
-import org.apache.kafka.streams.kstream.Materialized;
+import org.apache.kafka.streams.kstream.*;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -41,22 +38,33 @@ public class StreamApplication {
 //		));
 //	}
 
-	// TODO import USERS and merge with streams
-    @Bean
-    public Function<KStream<Long, Message>, KStream<Long, Long>> kstream(StreamsBuilder kstreamBuilder) {
-        return kStream -> kStream
-                .filter((k, msg) -> StringUtils.hasText(msg.text()))
-                .map((k, msg) -> new KeyValue<>(msg.from(), 1L))
-                .groupByKey(Grouped.with(Serdes.Long(), Serdes.Long()))
-                .count(Materialized.as("msgCnt"))
-                .toStream();
-    }
 
-    @Bean
-    Consumer<KTable<Long, Long>> messageCounts() {
-        return counts -> counts
-                .toStream()
-                .foreach((k, v) -> log.info(
-                        String.format("user: %d - messages: %d", k, v)));
-    }
+    StreamsBuilder builder = new StreamsBuilder();
+
+    KStream<String, Long> wordCounts = builder.stream(
+            "word-counts-input-topic",
+            Consumed.with(
+                    Serdes.String(),
+                    Serdes.Long()
+            )
+    );
+
+	// TODO import USERS and merge with streams
+//    @Bean
+//    public Function<KStream<Long, Message>, KStream<Long, Long>> kstream(StreamsBuilder kstreamBuilder) {
+//        return kStream -> kStream
+//                .filter((k, msg) -> StringUtils.hasText(msg.text()))
+//                .map((k, msg) -> new KeyValue<>(msg.from(), 1L))
+//                .groupByKey(Grouped.with(Serdes.Long(), Serdes.Long()))
+//                .count(Materialized.as("msgCnt"))
+//                .toStream();
+//    }
+//
+//    @Bean
+//    Consumer<KTable<Long, Long>> messageCounts() {
+//        return counts -> counts
+//                .toStream()
+//                .foreach((k, v) -> log.info(
+//                        String.format("user: %d - messages: %d", k, v)));
+//    }
 }

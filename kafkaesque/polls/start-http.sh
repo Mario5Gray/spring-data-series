@@ -1,0 +1,1 @@
+java -jar http-source-kafka-3.2.1.jar ----spring.cloud.stream.bindings.output.destination=votenow --server.port=9090 --management.wavefront.metrics.export.enabled=false --management.datadog.metrics.export.enabled=false --http.path-pattern=/data
