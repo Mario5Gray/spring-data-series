@@ -1,29 +1,44 @@
-# R2DBC Example
+# spring-data-series
 
-This example shows what to do when using R2DBC with H2. We go through entity decoration, 
-custom ID Generation, and entity tests. 
-The schema can either be bootstrapped through the [ConnectionFactoryInitializer]() bean, or
-a well-placed `resources/schema.sql` file.
+An informal demonstration of R2DBC and Kafka Streams with Java17 and Spring Boot 2.7.x.
 
-Keep in mind that persisting new entities is flexible with Spring JDBC/R2DBC. The document on `custom id generation` 
-listed below gives great details about their usage contexts.
+## From JDBC to R2DBC
 
-What follows thereafter are standard Reactive test semantics such stream subscriptions and 
-state verification. We will discuss closely what happens at the `save` stage, then what to
-expect from the RDBMS. [H2](https://www.h2database.com/html/main.html) is used as our test database, but nothing prevents one from
-dropping in a connection to PostgresSQl. A caveat that accompanies the use of RDBMS's are the
-explicit dialect which is possibly best met with minimal usage. However, this example 
-uses the H2 Dialect for both schema setup, and ID generation; A little refactor will be needed
-to migrate to a separate DB.
+First, start with a data silo - call it your typical RDBMS. We love RDBMS's - they're everywher and everyone knows em'. Reactive access to your RDBMS _can_ can offer increased data crunching flexibility. On one hand, everything is a stream; operators are standing by to `map`, `flatmap`, `filter`, and `groupBy` your table data. On the other hand, Configuring R2DBC access with Spring Boot becomes an exercise in remembering nothing more than seperate configuration properites or none at all if you wish to use H2.
+
+The guide under [silo]() gives a brief example upon which a developer may re-use as a low barrier entry to R2DBC. 
+
+### Explore Schema Setup
+
+Simply drop in your schema setup with `resources/schema.sql`. Alternately or Additionaly you may opt into the [ConnectionFactoryInitializer]() class which lets you make house-keeping decisions such as schema-setup, data population, and data cleanup.
+
+### Explore Domain Decoration
+
+Standard Spring Data annotations occur here. Some things like specifying a column or table can be managed through these decorations.
+Because the use of `record` classes - which are immutable - we also perform stateless operations upon insertion. Seeing that we cannot just _change_ a value on the target entity, we will use something [BeforeConvertCallback]() that can give us a new object while ensuring before-write changes are made.
+
+### Data Outlet
+
+We need an outlet for the data, so choose Kafka and/or REST.
+Currently, this demo lands with a REST endpoint for exposing the data. The next 'topic' will have us sending our data directly to Kafka upon ingest - though we might be tempted to skip DBMS altogether given Kafka's persistence. However this example will use REST endpoints to _feed_ Kafka streams that expose another layer of context sensative information on our domain.
+
+## Enter Kafka
+
+Such data can be published to Kafka streams, where a series of processes can transform the data with contextual relevance. Setup and connect to Kafka is also plain in simple with Spring Boot. 
+
+### First, launch Kafka
+
+You're already operating with a cloud provider, or have an installation - use the docker compose configuration to launch a cluster. 
+
+### The Producer
+
+Consume a REST endpoint and push data into a topic.
+
+### The Consumer
+
+Consume a topic and perform stream operations.
 
 
-## Flyaway
+## NOTES
 
-We like [Flyaway](https://flywaydb.org)... why, and why not? Flyway simplifies RDBMS schema management. If the goal
-is to ensure proper uniformity across an organization, then Flyway will add value
-to your developer cycles. Upstream DBA's can track schema changes while developers can save time by ignoring nitty-gritty details.
-
-
-## Links
-
-[Custom ID Generation](https://spring.io/blog/2021/09/09/spring-data-jdbc-how-to-use-custom-id-generation)
+Complete the last 2 sections, make it reactive if possible.  

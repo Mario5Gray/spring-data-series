@@ -9,7 +9,6 @@ import org.springframework.cloud.function.context.PollableBean;
 import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Bean;
-import org.springframework.scheduling.annotation.EnableScheduling;
 
 import java.util.Random;
 import java.util.concurrent.Executors;
@@ -20,7 +19,6 @@ import java.util.function.Supplier;
 
 // AIO function composition examples
 @Slf4j
-@EnableScheduling
 @SpringBootApplication
 public class ProducerApplication {
 

@@ -7,37 +7,26 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 
-import java.time.Duration;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
 @SpringBootApplication
-public class CommentsApplication {
+public class PollsApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(CommentsApplication.class, args);
+        SpringApplication.run(PollsApplication.class, args);
     }
 
     // Take Tuple (UserName, CID), and Produce
-    //  CID : Count of UserName
+    //  CID : Count
     @Bean
     public Function<KStream<String, Long>, KTable<Long, Long>> voting() {
         return pollVoteStream ->
                 pollVoteStream
-                        .map((voter, cid) -> new KeyValue<>(cid, voter))
+                        .map((voter, cid) -> KeyValue.pair(cid, voter))
                         .groupByKey(Grouped.with(Serdes.Long(), Serdes.String()))
                         .count(Materialized.as("vote-count-2"))
                 ;
-    }
-
-    // Take Table[Tuple (CID, Count)], Stream[Tuple (CID, Name)]],  and Produce
-    //  PollView (NAME, COUNT)  or KV<String, Long>
-    @Bean
-    public BiFunction<KTable<Long, Long>, KTable<Long, String>, KTable<String, Long>> polLView() {
-        return (countsTable, activityTable) ->
-                countsTable
-
-
     }
 }
 
@@ -53,5 +42,5 @@ record PollVote(String voter, Long choiceId) {}
 record PollVoteTotal(Long choiceId, Long count) {
 } // KV choiceId, count
 
-record PollResult(String pollName, String choiceText, Long count) {
+record PollResult(String choiceText, Long count) {
 }

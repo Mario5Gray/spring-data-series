@@ -1,0 +1,1 @@
+java -jar http-source-kafka-3.2.1.jar ----spring.cloud.stream.bindings.output.destination=activities123 --server.port=9091 --management.wavefront.metrics.export.enabled=false --management.datadog.metrics.export.enabled=false --http.path-pattern=/act

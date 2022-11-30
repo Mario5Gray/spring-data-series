@@ -4,6 +4,9 @@ spring.cloud.stream:
   bindings:
     voting-in-0.destination: votes
     voting-out-0.destination: counting
+#    results-in-0.destination: counting
+#    results-in-1.destination: activities
+#    results-out-0.destination: results
 spring.application.name: polls
 spring.cloud.stream.kafka.streams.binder:
   configuration:

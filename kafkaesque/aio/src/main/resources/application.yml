@@ -1,0 +1,9 @@
+spring.cloud.stream:
+  function.definition: sourceMessage|stringifyMessage|logString;logMessage
+  bindings:
+    logMessage-in-0.destination: texts
+    sourceMessage-out-0.destionation: texts
+    stringifyMessage-in-0.destination: texts
+    logString-in-0.destination: words
+  poller.fixed-delay: 6000
+  poller.messages.fixed-delay: 1000
