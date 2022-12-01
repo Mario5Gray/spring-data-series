@@ -53,9 +53,7 @@ public class ProducerApplication {
     @Bean
     ApplicationListener<ApplicationReadyEvent> runner(StreamBridge streamBridge) {
         return event -> Executors.newScheduledThreadPool(1).schedule(() -> {
-            for (var i = 0; i < 100; i++) {
                 bridgeSend(streamBridge);
-            }
         }, 2, TimeUnit.SECONDS);
     }
 
