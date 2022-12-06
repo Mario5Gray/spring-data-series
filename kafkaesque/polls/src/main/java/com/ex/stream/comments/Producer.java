@@ -22,36 +22,24 @@ public class Producer {
         props.put(ProducerConfig.BATCH_SIZE_CONFIG, 16384);
         props.put(ProducerConfig.LINGER_MS_CONFIG, 1);
         props.put(ProducerConfig.BUFFER_MEMORY_CONFIG, 33554432);
-        props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
-        props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, LongSerializer.class);
+        props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, LongSerializer.class);
+        props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
 
-        List<KeyValue<String, Long>> userVotes = Arrays.asList(
-                new KeyValue<>("alice", 1L),
-                new KeyValue<>("bob", 4L),
-                new KeyValue<>("chao", 4L),
-                new KeyValue<>("dave", 4L),
-                new KeyValue<>("eve", 2L),
-                new KeyValue<>("fang", 3L)
+        List<KeyValue<Long, String>> polls = Arrays.asList(
+                new KeyValue<>(1L, "Java"),
+                new KeyValue<>(2L, "Scala"),
+                new KeyValue<>(3L, "Kotlin")
         );
 
 
-        DefaultKafkaProducerFactory<String, Long> pf = new DefaultKafkaProducerFactory<>(props);
-        KafkaTemplate<String, Long> template = new KafkaTemplate<>(pf, true);
-        template.setDefaultTopic("votes");
+        DefaultKafkaProducerFactory<Long, String> pf = new DefaultKafkaProducerFactory<>(props);
+        KafkaTemplate<Long, String> template = new KafkaTemplate<>(pf, true);
+        template.setDefaultTopic("polls");
 
-        for (KeyValue<String,Long> keyValue : userVotes) {
+        for (KeyValue<Long, String> keyValue : polls) {
             System.out.println("Sending " + keyValue.value);
             template.sendDefault(keyValue.key, keyValue.value);
         }
-
-        List<KeyValue<Long, String>> activities = Arrays.asList(
-                new KeyValue<>(1L, "Java"),
-                new KeyValue<>(2L, "PHP"),
-                new KeyValue<>(3L, "GO"),
-                new KeyValue<>(4L, "ERLANG"),
-                new KeyValue<>(5L, "RUST"),
-                new KeyValue<>(6L, "BASIC")
-        );
 
     }
 }

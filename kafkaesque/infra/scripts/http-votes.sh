@@ -1,0 +1,2 @@
+java -jar ../http-source-kafka-3.2.1.jar --spring.cloud.stream.bindings.output.destination=votes --server.port=9090 --management.wavefront.metrics.export.enabled=false --management.datadog.metrics.export.enabled=false --http.path-pattern=/vote --http.cors.allowed-headers=kafka_messagekey --http.mapped-request-headers=kafka_messagekey 
+#--spring.cloud.stream.kafka.bindings.output.producer.messageKeyExpression="headers['kafka_messagekey'].bytes"
