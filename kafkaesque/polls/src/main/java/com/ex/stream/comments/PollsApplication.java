@@ -1,7 +1,6 @@
 package com.ex.stream.comments;
 
 import org.apache.kafka.common.serialization.Serdes;
-import org.apache.kafka.common.utils.Bytes;
 import org.apache.kafka.streams.KeyValue;
 import org.apache.kafka.streams.kstream.*;
 import org.springframework.boot.SpringApplication;
@@ -10,7 +9,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Profile;
 
 import java.time.Duration;
-import java.util.Random;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
@@ -24,7 +22,7 @@ public class PollsApplication {
     // The following errors:
     // https://issues.apache.org/jira/browse/KAFKA-14270
 
-    //@Profile("count")
+    @Profile("count")
     @Bean
     public Function<KStream<Long, PollVote>, KTable<Long, Long>> countVotes() {
         return pollVoteStream ->
@@ -39,14 +37,13 @@ public class PollsApplication {
 
     }
 
-    //@Profile("results")
+    @Profile("results")
     @Bean
-    public BiFunction<KTable<Long, Long>, KTable<Long, PollChoice>, KStream<Long, String>> outputResults() {
+    public BiFunction<KTable<Long, Long>, KTable<Long, PollChoice>, KTable<Long, PollResult>> outputResults() {
         return (resultsTable, choiceTable) ->
                 resultsTable
                         .leftJoin(choiceTable,
-                                (cnt, choice) -> new PollResult(" " + choice.text(), cnt).toString())
-                        .toStream()
+                                (cnt, choice) -> new PollResult(" " + choice.text(), cnt))
                 ;
     }
 }

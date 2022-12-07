@@ -39,8 +39,8 @@ services:
       MANAGEMENT_WAVEFRONT_METRICS_EXPORT_ENABLED: false
       MANAGEMENT_DATADOG_METRICS_EXPORT_ENABLED: false
       HTTP_PATH-PATTERN: '/polls'
-      HTTP_CORS_ALLOWED-HEADERS: kafka_messagekey
-      HTTP_MAPPED-REQUEST-HEADERS: kafka_messagekey
+      HTTP_CORS_ALLOWED-HEADERS: messagekey
+      HTTP_MAPPED-REQUEST-HEADERS: messagekey
       SPRING_CLOUD_STREAM_KAFKA_BINDINGS_OUTPUT_PRODUCER_MESSAGEKEYEXPRESSION: "T(java.lang.Long).parseLong(headers['messagekey'].toString())"
       SPRING_KAFKA_BOOTSTRAP-SERVERS: 'broker:29092'
       SPRING_KAFKA_PRODUCER_KEY-SERIALIZER: org.apache.kafka.common.serialization.LongSerializer
@@ -58,18 +58,26 @@ services:
       MANAGEMENT_WAVEFRONT_METRICS_EXPORT_ENABLED: false 
       MANAGEMENT_DATADOG_METRICS_EXPORT_ENABLED: false 
       HTTP_PATH-PATTERN: '/vote'
-      HTTP_CORS_ALLOWED-HEADERS: kafka_messagekey 
-      HTTP_MAPPED-REQUEST-HEADERS: kafka_messagekey
+      HTTP_CORS_ALLOWED-HEADERS: messagekey 
+      HTTP_MAPPED-REQUEST-HEADERS: messagekey
       SPRING_CLOUD_STREAM_KAFKA_BINDINGS_OUTPUT_PRODUCER_MESSAGEKEYEXPRESSION: "T(java.lang.Long).parseLong(headers['messagekey'].toString())"
       SPRING_KAFKA_BOOTSTRAP-SERVERS: 'broker:29092'
       SPRING_KAFKA_PRODUCER_KEY-SERIALIZER: org.apache.kafka.common.serialization.LongSerializer
 
-  # polls-stream:
-  #   image: polls:0.0.1-SNAPSHOT
-  #   container_name: stream-polls
-  #   ports:
-  #     - "9000:8080"
-  #   depends_on:
-  #     - broker, http-polls, http-votes
-  #   environment:
-  #     SPRING_KAFKA_BOOTSTRAP-SERVERS: 'broker:29092'
+  polls-stream:
+    image: polls:0.0.1-SNAPSHOT
+    container_name: stream-count-votes
+    depends_on:
+      - broker, http-polls, http-votes
+    environment:
+      SPRING_KAFKA_BOOTSTRAP-SERVERS: 'broker:29092'
+      SPRING_PROFILES_ACTIVE: count
+
+  results-stream:
+    image: polls:0.0.1-SNAPSHOT
+    container_name: stream-poll-results
+    depends_on:
+      - broker, http-polls, http-votes
+    environment:
+      SPRING_KAFKA_BOOTSTRAP-SERVERS: 'broker:29092'
+      SPRING_PROFILES_ACTIVE: results

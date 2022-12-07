@@ -4,6 +4,39 @@ This application is a Stream processor that utilizes SCS support for Kafka Strea
 to implement a 'polls' service. To get started, stand up the Streams and Kafka infrastructure
 by executing the scripts in the `kafkaesque/infra` directory.
 
+## App layout
+
+The application takes in votes on potential poll choices, then emits those results to a 
+dashboard like Grafana.
+
+Here is the application layout:
+
+```asciidoc
++--------------+                    +------------------+
+|    /votes    |     * votes        |  KAFKA Stream    |
+|              +------------------->|                  |
+|  HTTP SOURCE |                    |  count votes     |
+|              |                    |                  |
++--------------+                    +---------+--------+
+                                              | (left join)
+                                              | * counts
++--------------+                    +---------v--------+
+|    /polls    |                    |  KAFKA Stream    |
+|              |     * polls        |                  |
+|  HTTP SOURCE +------------------->|  process results |
+|              |                    |                  |
++--------------+                    +---------+--------+
+                                              |
+                                              |
+                  *=Kafka Topic Names         |
+                                              |               +-------------------+
+                                              |* results      |                   |
+                                              |               |                   |
+                                              +-------------->|    Dashboard      |
+                                                              |                   |
+                                                              +-------------------+
+```
+
 ## Build the app
 
 To get started, you will need to build the Docker image for streams processors in the main part of the app.

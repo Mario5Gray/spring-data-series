@@ -1,0 +1,7 @@
+spring.cloud.stream:
+  function:
+    definition: countVotes
+  bindings:
+    countVotes-in-0.destination: votes
+    countVotes-out-0.destination: counts
+spring.application.name: countVotes

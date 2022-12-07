@@ -4,5 +4,5 @@ read POLLNAME
 JSON='{"choiceId":"'${POLLKEY}'","text":"'${POLLNAME}'"}'
 echo $POLLKEY : $JSON
 
-curl -X POST http://localhost:9091/polls -H "kafka_messagekey: ${POLLKEY}" -H 'Content-Type: application/json' -H 'Accept: application/json' -d ${JSON}
+curl -X POST http://localhost:9091/polls -H "messagekey: ${POLLKEY}" -H 'Content-Type: application/json' -H 'Accept: application/json' -d ${JSON}
 done
