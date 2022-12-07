@@ -10,6 +10,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Profile;
 
 import java.time.Duration;
+import java.util.Random;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
@@ -20,9 +21,12 @@ public class PollsApplication {
         SpringApplication.run(PollsApplication.class, args);
     }
 
-    @Profile("count")
+    // The following errors:
+    // https://issues.apache.org/jira/browse/KAFKA-14270
+
+    //@Profile("count")
     @Bean
-    public Function<KStream<Bytes, PollVote>, KTable<Long, Long>> countVotes() {
+    public Function<KStream<Long, PollVote>, KTable<Long, Long>> countVotes() {
         return pollVoteStream ->
                 pollVoteStream
                         .map((voter, pollVote) -> KeyValue.pair(Long.valueOf(pollVote.choiceId()), pollVote.voter()))
@@ -32,32 +36,17 @@ public class PollsApplication {
                         .toStream((id, cnt) -> id.key())
                         .toTable()
                 ;
+
     }
 
-    // Take Tuple (UserName, CID), and Produce
-    //  CID : Count
-    @Profile("oldcount")
+    //@Profile("results")
     @Bean
-    public Function<KStream<String, String>, KTable<Long, Long>> oldCountVotes() {
-        return pollVoteStream ->
-                pollVoteStream
-                        .map((voter, cid) -> KeyValue.pair(Long.valueOf(cid), voter))
-                        .groupByKey(Grouped.with(Serdes.Long(), Serdes.String()))
-                        .windowedBy(TimeWindows.ofSizeWithNoGrace(Duration.ofMinutes(2)))
-                        .count(Materialized.as("vote-count-2"))
-                        .toStream((id, cnt) -> id.key())
-                        .toTable()
-                ;
-    }
-
-    @Profile("results")
-    @Bean
-    public BiFunction<KTable<Long, Long>, KTable<Long, String>, KStream<Long, String>> outputResults() {
+    public BiFunction<KTable<Long, Long>, KTable<Long, PollChoice>, KStream<Long, String>> outputResults() {
         return (resultsTable, choiceTable) ->
                 resultsTable
                         .leftJoin(choiceTable,
-                                (cnt, choice) -> new PollResult(choice, cnt).toString())
-                .toStream()
+                                (cnt, choice) -> new PollResult(" " + choice.text(), cnt).toString())
+                        .toStream()
                 ;
     }
 }

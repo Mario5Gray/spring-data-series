@@ -1,7 +1,6 @@
-
 spring.cloud.stream:
   function:
-    definition: outputResults
+    definition: countVotes;outputResults
   bindings:
     countVotes-in-0.destination: votes
     countVotes-out-0.destination: counts
@@ -11,13 +10,9 @@ spring.cloud.stream:
 #    results-in-0.destination: counting
 #    results-in-1.destination: activities
 #    results-out-0.destination: results
-spring.application.name: polls
+spring.application.name: results
 spring.cloud.stream.kafka.streams.binder:
   configuration:
     default.key.serde: org.apache.kafka.common.serialization.Serdes$LongSerde
     default.value.serde: org.apache.kafka.common.serialization.Serdes$LongSerde
     commit.interval.ms: 1000
-spring:
-  cloud:
-    function:
-      definition: countVotes;outputResults
