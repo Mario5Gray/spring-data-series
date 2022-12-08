@@ -21,7 +21,6 @@ public class PollsApplication {
 
     // The following errors:
     // https://issues.apache.org/jira/browse/KAFKA-14270
-
     @Profile("count")
     @Bean
     public Function<KStream<Long, PollVote>, KTable<Long, Long>> countVotes() {
@@ -30,11 +29,9 @@ public class PollsApplication {
                         .map((voter, pollVote) -> KeyValue.pair(Long.valueOf(pollVote.choiceId()), pollVote.voter()))
                         .groupByKey(Grouped.with(Serdes.Long(), Serdes.String()))
                         .windowedBy(TimeWindows.ofSizeWithNoGrace(Duration.ofMinutes(2)))
-                        .count(Materialized.as("vote-count-2"))
+                        .count(Materialized.as("vote-count"))
                         .toStream((id, cnt) -> id.key())
-                        .toTable()
-                ;
-
+                        .toTable();
     }
 
     @Profile("results")
@@ -43,8 +40,8 @@ public class PollsApplication {
         return (resultsTable, choiceTable) ->
                 resultsTable
                         .leftJoin(choiceTable,
-                                (cnt, choice) -> new PollResult(" " + choice.text(), cnt))
-                ;
+                                (cnt, choice) -> new PollResult(choice.text(), cnt)
+                        );
     }
 }
 
@@ -57,9 +54,6 @@ record PollChoice(Long choiceId, String text) {
 
 record PollVote(String voter, Long choiceId) {
 }
-
-record PollVoteTotal(Long choiceId, Long count) {
-} // KV choiceId, count
 
 record PollResult(String choiceText, Long count) {
 }

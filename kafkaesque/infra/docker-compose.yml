@@ -64,20 +64,41 @@ services:
       SPRING_KAFKA_BOOTSTRAP-SERVERS: 'broker:29092'
       SPRING_KAFKA_PRODUCER_KEY-SERIALIZER: org.apache.kafka.common.serialization.LongSerializer
 
-  polls-stream:
+  stream-count-votes:
     image: polls:0.0.1-SNAPSHOT
     container_name: stream-count-votes
     depends_on:
-      - broker, http-polls, http-votes
+      - broker, http-source-polls, http-source-votes
     environment:
       SPRING_KAFKA_BOOTSTRAP-SERVERS: 'broker:29092'
       SPRING_PROFILES_ACTIVE: count
 
-  results-stream:
+  stream-poll-results:
     image: polls:0.0.1-SNAPSHOT
     container_name: stream-poll-results
     depends_on:
-      - broker, http-polls, http-votes
+      - broker, http-source-polls, http-source-votes
     environment:
       SPRING_KAFKA_BOOTSTRAP-SERVERS: 'broker:29092'
       SPRING_PROFILES_ACTIVE: results
+
+  ws-sink-results:
+    image: springcloudstream/websocket-sink-kafka:3.2.1
+    container_name: ws-sink-results
+    depends_on:
+      - broker, stream-count-votes
+    ports:
+      - "9095:9095"
+      - "9096:9096"      
+    environment:
+      SPRING_CLOUD_STREAM_BINDINGS_INPUT_DESTINATION: results
+      MANAGEMENT_WAVEFRONT_METRICS_EXPORT_ENABLED: false
+      MANAGEMENT_DATADOG_METRICS_EXPORT_ENABLED: false
+      WEBSOCKET_CONSUMER_PORT: 9095
+      SERVER_PORT: 9096
+      WEBSOCKET_CONSUMER_PATH: '/ws'    
+      SPRING_KAFKA_BOOTSTRAP-SERVERS: 'broker:29092'
+      SPRING_KAFKA_CONSUMER_KEY-DESERIALIZER: org.apache.kafka.common.serialization.LongDeserializer
+      SPRING_KAFKA_CONSUMER_VALUE-DESERIALIZER: org.apache.kafka.common.serialization.StringDeserializer
+      LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_CLOUD_FN_CONSUMER_WEBSOCKET: TRACE
+      ENDPOINTS.WEBSOCKETCONSUMERTRACE.ENABLED: true
