@@ -6,8 +6,9 @@ by executing the scripts in the `kafkaesque/infra` directory.
 
 ## App layout
 
-The application takes in votes on potential poll choices, then emits those results to a 
-dashboard like Grafana.
+The application takes in votes and polls over HTTP, then emits those results to a 
+websocket sink. The intermediary steps between source and sink are composed of Kafka streams
+which process votes, polls, and results.
 
 Here is the application layout:
 
@@ -18,7 +19,7 @@ Here is the application layout:
 |  HTTP SOURCE |                    |  count votes     |
 |              |                    |                  |
 +--------------+                    +---------+--------+
-                                              | (left join)
+                                              |
                                               | * counts
 +--------------+                    +---------v--------+
 |    /polls    |                    |  KAFKA Stream    |
@@ -27,19 +28,18 @@ Here is the application layout:
 |              |                    |                  |
 +--------------+                    +---------+--------+
                                               |
-                                              |
-                  *=Kafka Topic Names         |
-                                              |               +-------------------+
-                                              |* results      |                   |
-                                              |               |                   |
-                                              +-------------->|    Dashboard      |
-                                                              |                   |
-                                                              +-------------------+
+                                              | * results
+               *=Kafka topic name   +---------v--------+
+                                    |   /websocket     |
+                                    |                  |
+                                    |  websocket sink  |
+                                    |                  |
+                                    +------------------+
 ```
 
-## Build the app
+## Build the stream components
 
-To get started, you will need to build the Docker image for streams processors in the main part of the app.
+To get started, you will need to build the Docker image for streams processors in the main part of the app called `polls`.
 
 From the root of the repository:
 
@@ -51,10 +51,10 @@ The image that pops out will be called from our docker compose file.
 
 ## Deploy the Infra
 
-This 'docker-compose.yml' file starts instances of Kafka, Zookeeper, polls, http-polls and http-votes. 
-The later 2 containers are HTTP endpoints we will talk to in order to furnish data for the application.
-These applications are the Kafka-bound [HTTP Source Stream](https://github.com/spring-cloud/stream-applications/blob/main/applications/source/http-source/README.adoc) variety
-that let us send JSON data into the streams via HTTP.
+This 'docker-compose.yml' file starts instances of Kafka, Zookeeper, polls, websocket-sink, http-polls and http-votes. The later 2 containers are HTTP endpoints we will send app specific data.
+These applications are the Kafka-bound [HTTP Source Stream](https://github.com/spring-cloud/stream-applications/blob/main/applications/source/http-source/README.adoc) variety that let us send JSON data into the streams via HTTP and emit those payloads into a kafka topic.
+
+Be sure to have the following ports open: 9092, 9090, 9091, 9095, 9096.
 
 From the root of the repository:
 ```bash
@@ -62,9 +62,7 @@ $ cd kafkaesque/infra
 $ docker compose up
 ```
 
-In addition to Kafka infrastructure, a couple of  are 
-started. 
-
+Once the logs finish scrolling, you are then ready to interact with the application.
 ## Feed the data
 
 The Poll questionnaire is an arrangement of choices that are composed of the following:
@@ -83,10 +81,26 @@ You can send this data to the `http-polls` endpoint by executing:
 infra $ ./send-polls.sh
 ```
 
-Currently, we have some vote data to send but plan to provide a WEB interface. For now,
-send the votes to the `http-votes` endpoint by executing `send-votes.sh' command:
+Next, we can listen to the output of the `results` topic by subscribing to the websocket-sink.
+In this example, we will use [websocat](https://github.com/vi/websocat) to connect and listen to outbound results data.
+
+```bash
+$ websocat http://localhost:9095/websocket
+```
+
+Finally, we have some vote data to send to the `http-votes` endpoint by executing `send-votes.sh' command:
 
 ```shell
 infra $ ./send-votes.sh
 ```
 
+At this point, you may watch the `websocat` websocket listener emit the final vote counts:
+
+```text
+websocat ws://localhost:9095/websocket
+{"choiceText":"Kotlin","count":1}
+{"choiceText":"Scala","count":4}
+{"choiceText":"Java","count":1}
+```
+
+This is the culmination of all stream processors.
