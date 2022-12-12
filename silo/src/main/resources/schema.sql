@@ -1,6 +1,8 @@
 CREATE SEQUENCE primary_key;
 DROP TABLE IF EXISTS users;
 DROP TABLE IF EXISTS messages;
+DROP TABLE IF EXISTS poll_topics;
+
 CREATE TABLE users
 (
     id   BIGINT PRIMARY KEY,
@@ -11,5 +13,10 @@ CREATE TABLE messages
     id   BIGINT PRIMARY KEY,
     fromId BIGINT NOT NULL,
     toId   BIGINT NOT NULL,
+    text VARCHAR(255) NOT NULL
+);
+CREATE TABLE poll_topics
+(
+    id   BIGINT PRIMARY KEY,
     text VARCHAR(255) NOT NULL
 );

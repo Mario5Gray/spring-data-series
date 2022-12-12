@@ -1,8 +1,10 @@
 package ex.data.silo;
 
 import ex.data.silo.domain.Message;
+import ex.data.silo.domain.PollTopic;
 import ex.data.silo.domain.User;
 import ex.data.silo.repository.MessageRepository;
+import ex.data.silo.repository.PollTopicRepository;
 import ex.data.silo.repository.UserRepository;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -20,6 +22,28 @@ public class SiloRepositoryTests {
 
     @Autowired
     MessageRepository messages;
+
+    @Autowired
+    PollTopicRepository polls;
+
+    @Test
+    void test_should_save_find_poll_topic() {
+        var poll = new PollTopic(null, "test assured");
+
+        var flux = polls
+                .save(poll)
+                .thenMany(polls.findAll());
+
+        StepVerifier
+                .create(flux)
+                .consumeNextWith(msg -> {
+                    Assertions
+                            .assertThat(msg)
+                            .isNotNull()
+                            .hasNoNullFieldsOrProperties();
+                })
+                .verifyComplete();
+    }
 
     @Test
     void test_should_save_find_messages() {

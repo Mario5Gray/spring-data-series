@@ -1,5 +1,6 @@
 package ex.data.silo.config;
 
+import ex.data.silo.domain.PollTopic;
 import ex.data.silo.domain.User;
 import io.r2dbc.spi.ConnectionFactory;
 import org.springframework.context.annotation.Bean;
@@ -23,6 +24,20 @@ public class SiloConfiguration {
                         .map(id -> new User(id, user.name()));
             }
             return Mono.just(user);
+        };
+    }
+
+    @Bean
+    BeforeConvertCallback<PollTopic> pollIdGeneratingCallback(DatabaseClient databaseClient) {
+
+        return (poll, sqlIdentifier) -> {
+            if (poll.id() == null) {
+                return databaseClient.sql("SELECT NEXT VALUE FOR primary_key")
+                        .map(row -> row.get(0, Long.class))
+                        .first()
+                        .map(id -> new PollTopic(id, poll.text()));
+            }
+            return Mono.just(poll);
         };
     }
 
