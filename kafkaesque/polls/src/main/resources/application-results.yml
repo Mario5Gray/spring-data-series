@@ -2,7 +2,7 @@ spring.cloud.stream:
   function:
     definition: outputResults
   bindings:
-    outputResults-in-0.destination: counts
+    outputResults-in-0.destination: countVotes
     outputResults-in-1.destination: polls
     outputResults-out-0.destination: results
 spring:

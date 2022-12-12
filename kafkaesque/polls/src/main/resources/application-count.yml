@@ -3,5 +3,5 @@ spring.cloud.stream:
     definition: countVotes
   bindings:
     countVotes-in-0.destination: votes
-    countVotes-out-0.destination: counts
+    countVotes-out-0.destination: countVotes
 spring.application.name: countVotes
