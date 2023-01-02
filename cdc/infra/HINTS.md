@@ -32,7 +32,7 @@ Post this bit of JSON to the connector:
 
 ```json
 {
-  "name": "inventory-connector",  
+  "name": "polls-connector",  
   "config": {  
     "connector.class": "io.debezium.connector.mysql.MySqlConnector",
     "tasks.max": "1",  
@@ -42,9 +42,9 @@ Post this bit of JSON to the connector:
     "database.password": "dbz",
     "database.server.id": "184054",  
     "database.server.name": "dbserver1",  
-    "database.include.list": "inventory",  
+    "database.include.list": "polls",  
     "database.history.kafka.bootstrap.servers": "kafka:9092",  
-    "database.history.kafka.topic": "schema-changes.inventory"  
+    "database.history.kafka.topic": "schema-changes.polls"  
   }
 }
 ```

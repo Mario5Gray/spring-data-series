@@ -16,20 +16,30 @@ services:
      - zookeeper
     environment:
      - ZOOKEEPER_CONNECT=zookeeper:2181
+  connect:
+    image: quay.io/debezium/connect:${DEBEZIUM_VERSION}
+    container_name: connect
+    ports:
+     - 8083:8083
+    links:
+     - kafka
+     - mysql
+    environment:
+     - BOOTSTRAP_SERVERS=kafka:9092
+     - GROUP_ID=1
+     - CONFIG_STORAGE_TOPIC=my_connect_configs
+     - OFFSET_STORAGE_TOPIC=my_connect_offsets
+     - STATUS_STORAGE_TOPIC=my_connect_statuses  
   mysql:
-    image:   quay.io/debezium/example-mysql:${DEBEZIUM_VERSION}
+    image:  mysql:5.7
     container_name: mysql
     ports:
       - 3306:3306
+    command: --server-id=1 --log-bin
     environment:
       - MYSQL_ROOT_PASSWORD=debezium
       - MYSQL_USER=mysqluser
       - MYSQL_PASSWORD=mysqlpw
-    healthcheck:
-      test: ["CMD", 'mysqladmin', 'ping', '-h', 'localhost', '-u', 'root', '-p$$MYSQL_ROOT_PASSWORD' ]
-      interval: 30s
-      timeout: 30s
-      retries: 5
     volumes:
       - "./scripts/schema.sql:/docker-entrypoint-initdb.d/1.sql"
   pollsweb:
@@ -50,17 +60,3 @@ services:
         delay: 5s
         max_attempts: 3
         window: 120s    
-  connect:
-    image: quay.io/debezium/connect:${DEBEZIUM_VERSION}
-    container_name: connect
-    ports:
-     - 8083:8083
-    links:
-     - kafka
-     - mysql
-    environment:
-     - BOOTSTRAP_SERVERS=kafka:9092
-     - GROUP_ID=1
-     - CONFIG_STORAGE_TOPIC=my_connect_configs
-     - OFFSET_STORAGE_TOPIC=my_connect_offsets
-     - STATUS_STORAGE_TOPIC=my_connect_statuses

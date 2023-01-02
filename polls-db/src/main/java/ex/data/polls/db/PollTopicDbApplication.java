@@ -7,7 +7,7 @@ import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
 @SpringBootApplication
 @EnableJdbcRepositories
 public class PollTopicDbApplication {
-	public static void main(String[] args) throws Exception {
+	public static void main(String[] args) {
 		SpringApplication.run(PollTopicDbApplication.class, args);
 	}
 
